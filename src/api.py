@@ -7,6 +7,8 @@ from .cache import cache
 from .constants_and_b64_assets import *
 from .http_client import *
 from .utils import *
+from .chess_dot_com import ChessDotCom
+from .lichess import Lichess
 
 app = Flask(__name__)
 app.config["CACHE_TYPE"] = "SimpleCache"
@@ -34,54 +36,28 @@ def health():
 @app.route("/widget")
 def get_widget():
 
+    platform = request.args.get("platform", None)
     username = request.args.get("username", "")
     theme = request.args.get("theme", "")
-    logo = request.args.get("logo", False)
-    logo_bool = True if logo == "true" else False
+    logo_bool = True if request.args.get("logo", False) == "true" else False
 
-    if not validate_username(username=username):
-        return {"error": "Invalid username"}, 400
+    if not platform or platform not in ["chess-dot-com", "lichess"]:
+        return {"error": "Empty/invalid platform"}, 400
 
-    # Profile
-    profile_resp = get_profile_data(username=username)
-    if profile_resp.status_code != 200:
-        return {"error": "Could not fetch profile data from chess.com"}, 404
-    profile_body = profile_resp.json()
-    avatar_url = profile_body.get("avatar")
-    profile_url = profile_body["url"]
-    title = profile_body.get("title")
-    country_url = profile_body["country"]
-    country_code = country_url.split("/")[-1]
-    last_online = profile_body["last_online"]
-    last_online_formatted = format_last_online(timestamp=last_online)
-    joined = profile_body["joined"]
-    joined_month_year = convert_epoch_to_month_year(timestamp=joined)
-    league = profile_body.get("league")
-
-    # Stats
-    stats_resp = get_player_stats(username=username)
-    if stats_resp.status_code != 200:
-        return {"error": "Could not fetch stats data from chess.com"}, 404
-    stats_body = stats_resp.json()
-    rapid_stats = normalize_stats(stats=stats_body.get("chess_rapid"))
-    blitz_stats = normalize_stats(stats=stats_body.get("chess_blitz"))
-    bullet_stats = normalize_stats(stats=stats_body.get("chess_bullet"))
-
-    svg = generate_svg(
-        profile_url=profile_url,
-        avatar=avatar_url,
-        country_code=country_code,
-        username=username,
-        league=league,
-        title=title,
-        joined=joined_month_year,
-        last_seen=last_online_formatted,
-        rapid_stats=rapid_stats,
-        blitz_stats=blitz_stats,
-        bullet_stats=bullet_stats,
-        theme=theme,
-        platform_logo=logo_bool
-    )
+    if platform == "chess-dot-com":
+        is_username_valid = ChessDotCom.validate_username(username=username)
+        if not is_username_valid:
+            return {"error": "Invalid username"}, 400
+        player_data = ChessDotCom.create_profile_summary(username=username)
+        svg = ChessDotCom.generate_svg(
+            player_data=player_data, theme=theme, platform_logo=logo_bool
+        )
+        print(svg)
+    elif platform == "lichess":
+        player_data = Lichess.create_profile_summary(username=username)
+        svg = Lichess.generate_svg(
+            player_data=player_data, theme=None, platform_logo=None
+        )
 
     return Response(
         svg,
@@ -95,4 +71,4 @@ def get_widget():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
