@@ -29,8 +29,10 @@
   - [x] Design card
   - [x] Fix string width estimator
   - [x] What if username is too long and the flair/flag overlaps the joined date?
-  - [ ] Themes
-  - [ ] Platform logo
+  - [x] Themes
+  - [x] Platform logo
+  - [ ] Earth flag
+  - [ ] Antarctica flag
 - [ ] Activity graph (GitHub commit graph style)
 - [ ] Parallelize upstream requests
 - [x] Handle long usernames like 'longestusernameinchessofc', 'WWWWWWWWWWWWWWWWWWWW'
@@ -40,4 +42,4 @@
 - [ ] Cache json body instead of the response object?
 - [ ] Make generate flag svg a static class method
 - [x] Refactor code - move lichess and chess.com specific constants/functions into the respective classes
-- [ ] Typo solarized theme name
+- [x] Typo solarized theme name

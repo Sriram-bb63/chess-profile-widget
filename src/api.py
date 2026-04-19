@@ -49,12 +49,15 @@ def get_widget():
         if not is_username_valid:
             return {"error": "Invalid username"}, 400
         player_data = ChessDotCom.create_profile_summary(username=username)
+        if "error" in player_data.keys():
+            return player_data
         svg = ChessDotCom.generate_svg(
             player_data=player_data, theme=theme, platform_logo=logo_bool
         )
-        print(svg)
     elif platform == "lichess":
         player_data = Lichess.create_profile_summary(username=username)
+        if "error" in player_data.keys():
+            return player_data
         svg = Lichess.generate_svg(
             player_data=player_data, theme=theme, platform_logo=logo_bool
         )

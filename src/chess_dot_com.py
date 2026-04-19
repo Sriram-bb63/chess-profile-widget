@@ -57,7 +57,7 @@ class ChessDotCom:
         # Profile
         profile_resp = ChessDotCom.get_profile_data(username=username)
         if profile_resp.status_code != 200:
-            return {"error": "Could not fetch profile data from chess.com"}, 404
+            return {"error": "Could not fetch profile data from chess.com"}
         profile_body = profile_resp.json()
         profile_summary["username"] = username
         profile_summary["avatar_url"] = profile_body.get("avatar")
@@ -75,7 +75,7 @@ class ChessDotCom:
         # Stats
         stats_resp = ChessDotCom.get_player_stats(username=username)
         if stats_resp.status_code != 200:
-            return {"error": "Could not fetch stats data from chess.com"}, 404
+            return {"error": "Could not fetch stats data from chess.com"}
         stats_body = stats_resp.json()
         profile_summary["stats"] = {}
         profile_summary["stats"]["rapid"] = ChessDotCom.normalize_stats(
