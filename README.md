@@ -1,84 +1,64 @@
-# chess.com-profile-widget
+# chess-profile-widget
 
-Showcase your chess.com profile as a widget in your GitHub home page and/or in your portfolio, blogs, social media etc. You can practically use it anywhere since it is a fully self contained SVG.
+Showcase your chess.com/lichess profile as a widget in your GitHub home page and/or in your portfolio, blogs, social media etc. You can practically use it anywhere since it is a fully self contained SVG.
 
 ## Sample widget
+****
+![theme=default](https://chess-com-profile-widget.onrender.com/widget?platform=chess-dot-com&username=hikaru)
 
-![theme=default](https://chess-com-profile-widget.onrender.com/widget?username=hikaru&theme=default)
+![theme=default](https://chess-com-profile-widget.onrender.com/widget?platform=chess-dot-com&username=1234bb63&logo=true&theme=blues)
+
+![theme=default](https://chess-com-profile-widget.onrender.com/widget?platform=lichess&username=ArtOfDeception)
+
+![theme=default](https://chess-com-profile-widget.onrender.com/widget?platform=lichess&username=visualdennis&theme=black&logo=true)
 
 
 ## How to use
 
-You will need to provide your chess.com username and optionally a theme. 
+Provide the following inputs as URL params to get started:
+- Platform – "chess-dot-com" or "lichess"
+- Username – your Chess.com or Lichess username
+- Footer with logo (optional) – "true" or "false" (default is "false")
+- Theme (optional) – choose from the available themes listed below
+
+### URL parameters
+
+1. `platform` *required* - "chess-dot-com" or "lichess" to get your account data
+2. `username` *required* - Your Chess.com username
+3. `theme` *optional* - Any of the themes listed below. If a theme could not be found, the default theme is used
+4. `logo` *optional* - `true` to display a footer section with the Chess.com logo. Default value is `false`
 
 ### Embed in a ``*.md`` file
 
 ```md
-![chess.com-profile-widget](https://chess-com-profile-widget.onrender.com/widget?username=your-username&theme=your-theme)
+![chess.com-profile-widget](https://chess-com-profile-widget.onrender.com/widget?platform=your-platform&username=your-username&theme=your-theme&logo=false)
 ```
 or
 ```md
 <p align="center">
-  <img src="https://chess-com-profile-widget.onrender.com/widget?username=your-username&theme=your-theme" alt="chess.com-profile-widget"/>
+  <img src="https://chess-com-profile-widget.onrender.com/widget?platform=your-platform&username=your-username&theme=your-theme&logo=false" alt="chess.com-profile-widget"/>
 </p>
 ```
 
 ### Embed in a ``*.html`` file
 
 ```html
-<img src="https://chess-com-profile-widget.onrender.com/widget?username=your-username&theme=your-theme" alt="chess.com-profile-widget">
+<img src="https://chess-com-profile-widget.onrender.com/widget?platform=your-platform&username=your-username&theme=your-theme&logo=false" alt="chess.com-profile-widget">
 ```
 
 > You can also use ``iframe`` / ``div`` / ``embed`` tags if you prefer
 
-### URL parameters
-
-1. `username` *required* - Your Chess.com username
-2. `theme` *optional* - Any of the themes listed below. If a theme could not be found, the default theme is used
-3. `logo` *optional* - `true` to display a footer section with the Chess.com logo. Default value is `false`
 
 
 ### Available themes
 
-_Widgets may fail to load due to server side cache invalidation. Please refresh the page to render all examples_
-
-**default**
-
-![theme:default](https://chess-com-profile-widget.onrender.com/widget?username=gothamchess&theme=default)
----
-**black**
-
-![theme:black](https://chess-com-profile-widget.onrender.com/widget?username=thevish&theme=black)
----
-**github-dark**
-
-![theme:github-dark](https://chess-com-profile-widget.onrender.com/widget?username=goofygen&theme=github-dark)
----
-**blues**
-
-![theme:blues](https://chess-com-profile-widget.onrender.com/widget?username=1234bb63&theme=blues)
----
-**white**
-
-![theme:white](https://chess-com-profile-widget.onrender.com/widget?username=rpragchess&theme=white)
----
-**red**
-
-![theme:red](https://chess-com-profile-widget.onrender.com/widget?username=alexandrabotez&theme=red)
----
-**dracula**
-
-![theme:dracula](https://chess-com-profile-widget.onrender.com/widget?username=divyadeshmukh23&theme=dracula)
----
-**terminal**
-
-![theme:terminal](https://chess-com-profile-widget.onrender.com/widget?username=echeceur11&theme=terminal)
----
-**brown**
-
-![theme:brown](https://chess-com-profile-widget.onrender.com/widget?username=magnuscarlsen&theme=brown)
----
-**solorized-dark**
-
-![theme:solorized-dark](https://chess-com-profile-widget.onrender.com/widget?username=supersecret12345&theme=solorized-dark)
----
+1. default
+2. black
+3. github-dark
+4. blues
+5. white
+6. red
+7. dracula
+8. terminal
+9. brown
+10. solarized-dark

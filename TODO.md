@@ -5,10 +5,41 @@
 - [ ] Layouts
 - [x] Timeouts
 - [x] Health
-- [ ] Lichess support
+- [x] Lichess support
+  - [ ] Username validation
+  - [x] Username
+  - [x] Bio
+  - [x] Flair
+  - [x] Title: ``GM, WGM, IM, WIM, FM, WFM, NM, CM, WCM, WNM, LM, BOT``
+  - [x] Patron
+  - [x] Patron color
+  - [x] Flag
+  - [x] Total play time
+  - [x] Created at
+  - [x] Last seen
+  - [x] Stats
+  - [x] Profile URL
+  - [x] Verified
+  - [x] Create b64 for all assets
+    - [x] Flairs
+    - [x] ~~Verified~~
+    - [x] Patron wings
+    - [x] ~~Titles~~
+    - [x] Icons
+  - [x] Design card
+  - [x] Fix string width estimator
+  - [x] What if username is too long and the flair/flag overlaps the joined date?
+  - [x] Themes
+  - [x] Platform logo
+  - [ ] Earth flag
+  - [ ] Antarctica flag
 - [ ] Activity graph (GitHub commit graph style)
 - [ ] Parallelize upstream requests
 - [x] Handle long usernames like 'longestusernameinchessofc', 'WWWWWWWWWWWWWWWWWWWW'
 - [ ] Discord?
 - [ ] Custom themes
 - [x] Platform logo
+- [ ] Cache json body instead of the response object?
+- [ ] Make generate flag svg a static class method
+- [x] Refactor code - move lichess and chess.com specific constants/functions into the respective classes
+- [x] Typo solarized theme name

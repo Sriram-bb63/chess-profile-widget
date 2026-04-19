@@ -1,37 +1,20 @@
-import base64
 import copy
 import datetime
 
-from .cache import cache
 from .constants_and_b64_assets import *
-from .http_client import timed_get
 
 
-def validate_username(username):
-    return bool(USERNAME_REGEX.fullmatch(username))
-
-
-@cache.memoize(timeout=CACHE_LONG_TTL)
-def get_profile_data(username):
-    profile_url = f"{BASE_URL}/pub/player/{username}"
-    profile_resp = timed_get(profile_url, headers=HEADERS)
-    return profile_resp
-
-
-@cache.memoize(timeout=CACHE_SHORT_TTL)
-def get_player_stats(username):
-    stats_url = f"{BASE_URL}/pub/player/{username}/stats"
-    stats_resp = timed_get(stats_url, headers=HEADERS)
-    return stats_resp
-
-
-def convert_epoch_to_month_year(timestamp):
+def convert_epoch_to_month_year(timestamp, unit="s"):
+    if unit == "ms":
+        timestamp = timestamp / 1000
     dt_obj = datetime.datetime.fromtimestamp(timestamp)
     dt_month_year = dt_obj.strftime("%b, %Y")
     return dt_month_year
 
 
-def format_last_online(timestamp):
+def format_last_online(timestamp, unit="s"):
+    if unit == "ms":
+        timestamp = timestamp / 1000
     dt_obj = datetime.datetime.fromtimestamp(timestamp)
     today = datetime.datetime.now()
     yesterday = today - datetime.timedelta(days=1)
@@ -45,6 +28,12 @@ def format_last_online(timestamp):
         return convert_epoch_to_month_year(timestamp=timestamp)
 
 
+def convert_secs_to_hours_mins(secs):
+    hours = secs // 3600
+    mins = (secs % 3600) // 60
+    return hours, mins
+
+
 def generate_flag_svg(country_code):
     if country_code not in FLAG_COORDINATES.keys():
         return ""
@@ -53,7 +42,7 @@ def generate_flag_svg(country_code):
 
 def get_string_width(text, font_size):
     string_width = (
-        sum([ARIAL_CHAR_WIDTH.get(ch, ARIAL_DFAULT_CHAR_WIDTH) for ch in text])
+        sum([ARIAL_CHAR_WIDTH.get(ch, ARIAL_DEFAULT_CHAR_WIDTH) for ch in text])
         * font_size
     )
     return string_width
@@ -76,93 +65,3 @@ def fit_username(username, font_size, max_width):
             high = mid - 1
 
     return best_fit_username
-
-
-def normalize_stats(stats):
-    normalized_stats = copy.deepcopy(STATS_SCHEMA)
-    if stats:
-        if "last" in stats.keys() and "rating" in stats["last"].keys():
-            normalized_stats["last"]["rating"] = stats["last"]["rating"]
-        if "best" in stats.keys() and "rating" in stats["best"].keys():
-            normalized_stats["best"]["rating"] = stats["best"]["rating"]
-        if "record" in stats.keys() and "win" in stats["record"].keys():
-            normalized_stats["record"]["win"] = stats["record"]["win"]
-        if "record" in stats.keys() and "draw" in stats["record"].keys():
-            normalized_stats["record"]["draw"] = stats["record"]["draw"]
-        if "record" in stats.keys() and "loss" in stats["record"].keys():
-            normalized_stats["record"]["loss"] = stats["record"]["loss"]
-    return normalized_stats
-
-
-@cache.memoize(timeout=CACHE_LONG_TTL)
-def generate_avatar_png_b64(avatar_url):
-    avatar_resp = timed_get(avatar_url)
-    return f"""data:image/png;base64,{base64.b64encode(avatar_resp.content).decode("utf-8")}"""
-
-
-def generate_svg(
-    profile_url,
-    avatar,
-    country_code,
-    username,
-    league,
-    title,
-    joined,
-    last_seen,
-    rapid_stats,
-    blitz_stats,
-    bullet_stats,
-    theme,
-    platform_logo
-):
-    if theme not in THEMES.keys():
-        theme = "default"
-    colors = THEMES[theme]
-    footer_section = f"""<rect y="30" width="400" height="265" fill="{colors['fg']}" rx="12" ry="12"/>""" if platform_logo else ""
-    platform_logo = f"""<image href="{CHESS_DOT_COM_LOGO}" height="20" x="11" y="269"/>""" if platform_logo else ""
-    background_svg = (
-        f"""<rect width="400" height="265" fill="{colors["bg"]}" rx="12" ry="12" />"""
-    )
-    avatar_svg = f"""<a href="{profile_url}" target="_blank"> <image href="{generate_avatar_png_b64(avatar_url=avatar) if avatar else NO_AVATAR_PNG_B64}" x="11" y="15" width="75" height="75" clip-path="inset(0% round 5px)" /> </a>"""
-    flag_svg = generate_flag_svg(country_code=country_code)
-    username_svg = f"""<a href="{profile_url}" target="_blank"> <text x="100" y="35" fill="{colors["text-bright"]}" font-family="Arial" font-size="16" font-weight="bold">{fit_username(username=username, font_size=16, max_width=180)}</text> </a>"""
-    if league:
-        league_svg = f"""<image href="{LEAGUES_SVG_B64[league.lower()]}" x="100" y="50" width="30" /><text x="135" y="63" fill="{colors["text-mid"]}" font-family="Arial" font-size="11">{league} league</text>"""
-    else:
-        league_svg = f"""<text x="100" y="63" fill="{colors["text-mid"]}" font-family="Arial" font-size="11">No league</text>"""
-    if title:
-        title_svg = f"""<image x="280" y="19" height="20" href="{TITLES_SVG_B64[title]}"> </image>"""
-        joined_svg_y = 55
-        last_seen_svg_y = 70
-    else:
-        title_svg = ""
-        joined_svg_y = 35
-        last_seen_svg_y = 50
-    joined_svg = f"""<text x="280" y="{joined_svg_y}" fill="{colors["text-light"]}" font-family="Arial" font-size="10">Joined: {joined}</text>"""
-    last_seen_svg = f"""<text x="280" y="{last_seen_svg_y}" fill="{colors["text-light"]}" font-family="Arial" font-size="10">Last seen: {last_seen}</text>"""
-    if rapid_stats:
-        rapid_section = f"""<rect x="10" y="100" width="120" height="150" fill="{colors["fg"]}" rx="8" ry="8" /> <image href="{TIME_RAPID_SVG_B64}" x="30" y="112" width="25" /> <text x="80" y="130" fill="{colors["text-bright"]}" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Rapid</text> <text x="70" y="160" fill="{colors["text-bright"]}" font-family="Arial" font-size="22" font-weight="bold" text-anchor="middle">{rapid_stats["last"]["rating"]}</text> <text x="70" y="185" fill="{colors["text-mid"]}" font-family="Arial" font-size="12" text-anchor="middle">Highest</text> <text x="70" y="200" fill="{colors["text-mid"]}" font-family="Arial" font-size="14" text-anchor="middle">{rapid_stats["best"]["rating"]}</text> <text x="70" y="225" font-family="Arial" font-size="11" text-anchor="middle"> <tspan fill="{colors["win"]}">{rapid_stats["record"]["win"]}</tspan> <tspan fill="{colors["text-mid"]}">/</tspan> <tspan fill="{colors["draw"]}">{rapid_stats["record"]["draw"]}</tspan> <tspan fill="{colors["text-mid"]}">/</tspan> <tspan fill="{colors["loss"]}">{rapid_stats["record"]["loss"]}</tspan> </text>"""
-    if blitz_stats:
-        blitz_section = f"""<rect x="140" y="100" width="120" height="150" fill="{colors["fg"]}" rx="8" ry="8" /> <image href="{TIME_BLITZ_SVG_B64}" x="165" y="112" width="25" /> <text x="208" y="130" fill="{colors["text-bright"]}" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Blitz</text> <text x="200" y="160" fill="{colors["text-bright"]}" font-family="Arial" font-size="22" font-weight="bold" text-anchor="middle">{blitz_stats["last"]["rating"]}</text> <text x="200" y="185" fill="{colors["text-mid"]}" font-family="Arial" font-size="12" text-anchor="middle">Highest</text> <text x="200" y="200" fill="{colors["text-mid"]}" font-family="Arial" font-size="14" text-anchor="middle">{blitz_stats["best"]["rating"]}</text> <text x="200" y="225" font-family="Arial" font-size="11" text-anchor="middle"> <tspan fill="{colors["win"]}">{blitz_stats["record"]["win"]}</tspan> <tspan fill="{colors["text-mid"]}">/</tspan> <tspan fill="{colors["draw"]}">{blitz_stats["record"]["draw"]}</tspan> <tspan fill="{colors["text-mid"]}">/</tspan> <tspan fill="{colors["loss"]}">{blitz_stats["record"]["loss"]}</tspan> </text>"""
-    if bullet_stats:
-        bullet_section = f"""<rect x="270" y="100" width="120" height="150" fill="{colors["fg"]}" rx="8" ry="8" /> <image href="{TIME_BULLET_SVG_B64}" x="295" y="115" width="23" /> <text x="340" y="130" fill="{colors["text-bright"]}" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Bullet</text> <text x="330" y="160" fill="{colors["text-bright"]}" font-family="Arial" font-size="22" font-weight="bold" text-anchor="middle">{bullet_stats["last"]["rating"]}</text> <text x="330" y="185" fill="{colors["text-mid"]}" font-family="Arial" font-size="12" text-anchor="middle">Highest</text> <text x="330" y="200" fill="{colors["text-mid"]}" font-family="Arial" font-size="14" text-anchor="middle">{bullet_stats["best"]["rating"]}</text> <text x="330" y="225" font-family="Arial" font-size="11" text-anchor="middle"> <tspan fill="{colors["win"]}">{bullet_stats["record"]["win"]}</tspan> <tspan fill="{colors["text-mid"]}">/</tspan> <tspan fill="{colors["draw"]}">{bullet_stats["record"]["draw"]}</tspan> <tspan fill="{colors["text-mid"]}">/</tspan> <tspan fill="{colors["loss"]}">{bullet_stats["record"]["loss"]}</tspan> </text>"""
-    svg = "".join(
-        [
-            """<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">""",
-            footer_section,
-            platform_logo,
-            background_svg,
-            avatar_svg,
-            flag_svg,
-            username_svg,
-            league_svg,
-            title_svg,
-            joined_svg,
-            last_seen_svg,
-            rapid_section,
-            blitz_section,
-            bullet_section,
-            """</svg>""",
-        ]
-    )
-    return svg
