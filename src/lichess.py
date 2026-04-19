@@ -173,18 +173,19 @@ class Lichess:
 
     @staticmethod
     def generate_svg(player_data, theme, platform_logo):
-        colors = {
-            "bg": "#1E1D1C",
-            "fg": "#363332",
-            "text-bright": "#DDE3ED",
-            "text-mid": "#C7CDD6",
-            "text-light": "#9CA3AF",
-            "win": "#22C55E",
-            "draw": "#6B7280",
-            "loss": "#EF4444",
-            "brown": "#A46E23",
-        }
-
+        if theme not in THEMES.keys():
+            theme = "default"
+        colors = THEMES[theme]
+        footer_section = (
+            f"""<rect y="30" width="400" height="265" fill="{colors['fg']}" rx="12" ry="12"/>"""
+            if platform_logo
+            else ""
+        )
+        platform_logo = (
+            f"""<image href="{LICHESS_LOGO_DARK_MODE if colors['dark-mode'] else LICHESS_LOGO_LIGHT_MODE}" height="20" x="11" y="269"/>"""
+            if platform_logo
+            else ""
+        )
         background_svg = (
             f"""<rect width="400" height="265" rx="5" ry="5" fill="{colors['bg']}" />"""
         )
@@ -207,7 +208,9 @@ class Lichess:
         title_svg = ""
         if player_data["title"]:
             title_svg = f"""<text x="{x_pos}" y="25" fill="#b68335" font-family="Arial" font-weight="bold" font-size="16" dominant-baseline="hanging">{player_data["title"]}</text>"""
-            title_width = get_string_width(player_data["title"], 16) * BOLD_WIDTH_MULTIPLIER
+            title_width = (
+                get_string_width(player_data["title"], 16) * BOLD_WIDTH_MULTIPLIER
+            )
             x_pos += title_width + GAP
 
         # Username (variable width)
@@ -228,16 +231,16 @@ class Lichess:
             )
 
         joined_last_seen_and_time_spent_svg = f"""
-            <text x="15" y="50" fill="#9CA3AF" font-family="Arial" font-size="10"
+            <text x="15" y="50" fill="{colors['text-light']}" font-family="Arial" font-size="10"
                 dominant-baseline="hanging">
                 <tspan>Joined:</tspan>
-                <tspan fill="#DDE3ED">{player_data['joined']}</tspan>
+                <tspan fill="{colors['text-bright']}">{player_data['joined']}</tspan>
                 <tspan>|</tspan>
                 <tspan>Last seen:</tspan>
-                <tspan fill="#DDE3ED">{player_data['last_seen']}</tspan>
+                <tspan fill="{colors['text-bright']}">{player_data['last_seen']}</tspan>
                 <tspan>|</tspan>
                 <tspan>Time spent:</tspan>
-                <tspan fill="#DDE3ED">{Lichess.normalize_time_spent(player_data["play_time"])}</tspan>
+                <tspan fill="{colors['text-bright']}">{Lichess.normalize_time_spent(player_data["play_time"])}</tspan>
             </text>
         """
 
@@ -260,6 +263,8 @@ class Lichess:
         svg = "".join(
             [
                 """<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">""",
+                footer_section,
+                platform_logo,
                 background_svg,
                 patron_wings_svg,
                 title_svg,

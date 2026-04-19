@@ -56,7 +56,7 @@ def get_widget():
     elif platform == "lichess":
         player_data = Lichess.create_profile_summary(username=username)
         svg = Lichess.generate_svg(
-            player_data=player_data, theme=None, platform_logo=None
+            player_data=player_data, theme=theme, platform_logo=logo_bool
         )
 
     return Response(
