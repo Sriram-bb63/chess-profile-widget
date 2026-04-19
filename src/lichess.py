@@ -186,7 +186,7 @@ class Lichess:
             else ""
         )
         platform_logo = (
-            f"""<image href="{LICHESS_LOGO_DARK_MODE if colors['dark-mode'] else LICHESS_LOGO_LIGHT_MODE}" height="20" x="11" y="269"/>"""
+            f"""<image href="{LICHESS_LOGO_DARK_MODE if colors['dark-mode'] else LICHESS_LOGO_LIGHT_MODE}" height="18" x="11" y="270"/>"""
             if platform_logo
             else ""
         )

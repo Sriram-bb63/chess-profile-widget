@@ -4,22 +4,21 @@ Showcase your chess.com/lichess profile as a widget in your GitHub home page and
 
 ## Sample widget
 
-![hikaru](https://chess-com-profile-widget.onrender.com/widget?platform=chess-dot-com&username=hikaru)
+<img src="https://chess-com-profile-widget.onrender.com/widget?platform=chess-dot-com&username=hikaru" alt="chess.com-profile-widget"/>
 
-![1234bb63](https://chess-com-profile-widget.onrender.com/widget?platform=chess-dot-com&username=1234bb63&logo=true&theme=blues)
+<img src="https://chess-com-profile-widget.onrender.com/widget?platform=lichess&username=ArtOfDeception&theme=brown" alt="chess.com-profile-widget"/>
 
-![ArtOfDeception](https://chess-com-profile-widget.onrender.com/widget?platform=lichess&username=ArtOfDeception)
+<img src="https://chess-com-profile-widget.onrender.com/widget?platform=chess-dot-com&username=1234bb63&logo=true&theme=blues" alt="chess.com-profile-widget"/>
 
-![visualdennis](https://chess-com-profile-widget.onrender.com/widget?platform=lichess&username=visualdennis&theme=black&logo=true)
-
+<img src="https://chess-com-profile-widget.onrender.com/widget?platform=lichess&username=visualdennis&theme=dracula&logo=true" alt="chess.com-profile-widget"/>
 
 ## How to use
 
 Provide the following inputs as URL params to get started:
-- Platform - "chess-dot-com" or "lichess"
-- Username - your Chess.com or Lichess username
-- Footer with logo (optional) - "true" or "false" (default is "false")
-- Theme (optional) - choose from the available themes listed below
+- Platform – "chess-dot-com" or "lichess"
+- Username – your Chess.com or Lichess username
+- Footer with logo (optional) – "true" or "false" (default is "false")
+- Theme (optional) – choose from the available themes listed below
 
 ### URL parameters
 
