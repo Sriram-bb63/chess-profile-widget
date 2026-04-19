@@ -99,6 +99,10 @@ class ChessDotCom:
         if theme not in THEMES.keys():
             theme = "default"
         colors = THEMES[theme]
+
+        # Dynamic height based on footer presence
+        svg_height = 300 if platform_logo else 265
+
         footer_section = (
             f"""<rect y="30" width="400" height="265" fill="{colors['fg']}" rx="12" ry="12"/>"""
             if platform_logo
@@ -132,7 +136,7 @@ class ChessDotCom:
         bullet_section = f"""<rect x="270" y="100" width="120" height="150" fill="{colors["fg"]}" rx="8" ry="8" /> <image href="{CHESS_DOT_COM_TIME_BULLET_SVG_B64}" x="295" y="115" width="23" /> <text x="340" y="130" fill="{colors["text-bright"]}" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Bullet</text> <text x="330" y="160" fill="{colors["text-bright"]}" font-family="Arial" font-size="22" font-weight="bold" text-anchor="middle">{player_data['stats']["bullet"]["last"]}</text> <text x="330" y="185" fill="{colors["text-mid"]}" font-family="Arial" font-size="12" text-anchor="middle">Highest</text> <text x="330" y="200" fill="{colors["text-mid"]}" font-family="Arial" font-size="14" text-anchor="middle">{player_data['stats']["bullet"]["last"]}</text> <text x="330" y="225" font-family="Arial" font-size="11" text-anchor="middle"> <tspan fill="{colors["win"]}">{player_data['stats']["bullet"]["wins"]}</tspan> <tspan fill="{colors["text-mid"]}">/</tspan> <tspan fill="{colors["draw"]}">{player_data['stats']["bullet"]["draws"]}</tspan> <tspan fill="{colors["text-mid"]}">/</tspan> <tspan fill="{colors["loss"]}">{player_data['stats']["bullet"]["losses"]}</tspan> </text>"""
         svg = "".join(
             [
-                """<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">""",
+                f"""<svg width="400" height="{svg_height}" xmlns="http://www.w3.org/2000/svg">""",
                 footer_section,
                 platform_logo,
                 background_svg,

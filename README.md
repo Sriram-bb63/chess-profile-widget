@@ -3,23 +3,23 @@
 Showcase your chess.com/lichess profile as a widget in your GitHub home page and/or in your portfolio, blogs, social media etc. You can practically use it anywhere since it is a fully self contained SVG.
 
 ## Sample widget
-****
-![theme=default](https://chess-com-profile-widget.onrender.com/widget?platform=chess-dot-com&username=hikaru)
 
-![theme=default](https://chess-com-profile-widget.onrender.com/widget?platform=chess-dot-com&username=1234bb63&logo=true&theme=blues)
+![hikaru](https://chess-com-profile-widget.onrender.com/widget?platform=chess-dot-com&username=hikaru)
 
-![theme=default](https://chess-com-profile-widget.onrender.com/widget?platform=lichess&username=ArtOfDeception)
+![1234bb63](https://chess-com-profile-widget.onrender.com/widget?platform=chess-dot-com&username=1234bb63&logo=true&theme=blues)
 
-![theme=default](https://chess-com-profile-widget.onrender.com/widget?platform=lichess&username=visualdennis&theme=black&logo=true)
+![ArtOfDeception](https://chess-com-profile-widget.onrender.com/widget?platform=lichess&username=ArtOfDeception)
+
+![visualdennis](https://chess-com-profile-widget.onrender.com/widget?platform=lichess&username=visualdennis&theme=black&logo=true)
 
 
 ## How to use
 
 Provide the following inputs as URL params to get started:
-- Platform – "chess-dot-com" or "lichess"
-- Username – your Chess.com or Lichess username
-- Footer with logo (optional) – "true" or "false" (default is "false")
-- Theme (optional) – choose from the available themes listed below
+- Platform - "chess-dot-com" or "lichess"
+- Username - your Chess.com or Lichess username
+- Footer with logo (optional) - "true" or "false" (default is "false")
+- Theme (optional) - choose from the available themes listed below
 
 ### URL parameters
 

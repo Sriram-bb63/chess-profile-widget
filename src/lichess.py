@@ -176,6 +176,10 @@ class Lichess:
         if theme not in THEMES.keys():
             theme = "default"
         colors = THEMES[theme]
+
+        # Dynamic height based on footer presence
+        svg_height = 300 if platform_logo else 265
+
         footer_section = (
             f"""<rect y="30" width="400" height="265" fill="{colors['fg']}" rx="12" ry="12"/>"""
             if platform_logo
@@ -214,8 +218,8 @@ class Lichess:
             x_pos += title_width + GAP
 
         # Username (variable width)
-        username_svg = f"""<text x="{x_pos}" y="25" fill="{colors['text-bright']}" font-family="Arial" font-size="16" dominant-baseline="hanging">{player_data['username']}</text>"""
-        x_pos += get_string_width(player_data["username"], 16) + GAP
+        username_svg = f"""<text x="{x_pos}" y="25" fill="{colors['text-bright']}" font-family="Arial" font-size="18" dominant-baseline="hanging">{player_data['username']}</text>"""
+        x_pos += get_string_width(player_data["username"], 18) + GAP
 
         # Flair (constant width)
         flair_svg = ""
@@ -262,7 +266,7 @@ class Lichess:
 
         svg = "".join(
             [
-                """<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">""",
+                f"""<svg width="400" height="{svg_height}" xmlns="http://www.w3.org/2000/svg">""",
                 footer_section,
                 platform_logo,
                 background_svg,
