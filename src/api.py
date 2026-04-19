@@ -5,7 +5,6 @@ from flask import Flask, Response, g, request
 
 from .cache import cache
 from .constants_and_b64_assets import *
-from .http_client import *
 from .utils import *
 from .chess_dot_com import ChessDotCom
 from .lichess import Lichess

@@ -1,6 +1,8 @@
+import concurrent.futures
+
+import requests
 from .cache import cache
 from .constants_and_b64_assets import *
-from .http_client import timed_get
 from .utils import *
 
 
@@ -13,22 +15,29 @@ class Lichess:
     @cache.memoize(timeout=CACHE_LONG_TTL)
     def get_profile_data(username):
         profile_url = f"{LICHESS_BASE_URL}/api/user/{username}"
-        profile_resp = timed_get(profile_url, headers=HEADERS)
+        profile_resp = requests.get(profile_url, headers=HEADERS)
         return profile_resp
 
     @staticmethod
     @cache.memoize(timeout=CACHE_SHORT_TTL)
-    def get_player_stats(username):
+    def get_rapid_stats(username):
         rapid_url = f"{LICHESS_BASE_URL}/api/user/{username}/perf/rapid"
-        rapid_resp = timed_get(rapid_url, headers=HEADERS)
+        rapid_resp = requests.get(rapid_url, headers=HEADERS)
+        return rapid_resp
 
+    @staticmethod
+    @cache.memoize(timeout=CACHE_SHORT_TTL)
+    def get_blitz_stats(username):
         blitz_url = f"{LICHESS_BASE_URL}/api/user/{username}/perf/blitz"
-        blitz_resp = timed_get(blitz_url, headers=HEADERS)
+        blitz_resp = requests.get(blitz_url, headers=HEADERS)
+        return blitz_resp
 
+    @staticmethod
+    @cache.memoize(timeout=CACHE_SHORT_TTL)
+    def get_bullet_stats(username):
         bullet_url = f"{LICHESS_BASE_URL}/api/user/{username}/perf/bullet"
-        bullet_resp = timed_get(bullet_url, headers=HEADERS)
-
-        return rapid_resp, blitz_resp, bullet_resp
+        bullet_resp = requests.get(bullet_url, headers=HEADERS)
+        return bullet_resp
 
     @staticmethod
     def normalize_stats(rapid_stats, blitz_stats, bullet_stats):
@@ -70,8 +79,17 @@ class Lichess:
     def create_profile_summary(username):
         profile_summary = {}
 
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            profile_future = executor.submit(Lichess.get_profile_data, username)
+            rapid_future = executor.submit(Lichess.get_rapid_stats, username)
+            blitz_future = executor.submit(Lichess.get_blitz_stats, username)
+            bullet_future = executor.submit(Lichess.get_bullet_stats, username)
+            profile_resp = profile_future.result()
+            rapid_resp = rapid_future.result()
+            blitz_resp = blitz_future.result()
+            bullet_resp = bullet_future.result()
+
         # Profile
-        profile_resp = Lichess.get_profile_data(username)
         if profile_resp.status_code != 200:
             return {"error": "Could not fetch profile data from lichess.org"}
         profile_body = profile_resp.json()
@@ -96,9 +114,6 @@ class Lichess:
         profile_summary["title"] = profile_body.get("title")
 
         # Stats
-        rapid_resp, blitz_resp, bullet_resp = Lichess.get_player_stats(
-            username=username
-        )
         if (
             rapid_resp.status_code != 200
             or blitz_resp.status_code != 200

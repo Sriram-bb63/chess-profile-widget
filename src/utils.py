@@ -1,4 +1,3 @@
-import copy
 import datetime
 
 from .constants_and_b64_assets import *
