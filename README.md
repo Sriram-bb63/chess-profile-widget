@@ -1,84 +1,43 @@
-# chess.com-profile-widget
+# TODO
 
-Showcase your chess.com profile as a widget in your GitHub home page and/or in your portfolio, blogs, social media etc. You can practically use it anywhere since it is a fully self contained SVG.
-
-## Sample widget
-
-![theme=default](https://chess-com-profile-widget.onrender.com/widget?username=hikaru&theme=default)
-
-
-## How to use
-
-You will need to provide your chess.com username and optionally a theme. 
-
-### Embed in a ``*.md`` file
-
-```md
-![chess.com-profile-widget](https://chess-com-profile-widget.onrender.com/widget?username=your-username&theme=your-theme)
-```
-or
-```md
-<p align="center">
-  <img src="https://chess-com-profile-widget.onrender.com/widget?username=your-username&theme=your-theme" alt="chess.com-profile-widget"/>
-</p>
-```
-
-### Embed in a ``*.html`` file
-
-```html
-<img src="https://chess-com-profile-widget.onrender.com/widget?username=your-username&theme=your-theme" alt="chess.com-profile-widget">
-```
-
-> You can also use ``iframe`` / ``div`` / ``embed`` tags if you prefer
-
-### URL parameters
-
-1. `username` *required* - Your Chess.com username
-2. `theme` *optional* - Any of the themes listed below. If a theme could not be found, the default theme is used
-3. `logo` *optional* - `true` to display a footer section with the Chess.com logo. Default value is `false`
-
-
-### Available themes
-
-_Widgets may fail to load due to server side cache invalidation. Please refresh the page to render all examples_
-
-**default**
-
-![theme:default](https://chess-com-profile-widget.onrender.com/widget?username=gothamchess&theme=default)
----
-**black**
-
-![theme:black](https://chess-com-profile-widget.onrender.com/widget?username=thevish&theme=black)
----
-**github-dark**
-
-![theme:github-dark](https://chess-com-profile-widget.onrender.com/widget?username=goofygen&theme=github-dark)
----
-**blues**
-
-![theme:blues](https://chess-com-profile-widget.onrender.com/widget?username=1234bb63&theme=blues)
----
-**white**
-
-![theme:white](https://chess-com-profile-widget.onrender.com/widget?username=rpragchess&theme=white)
----
-**red**
-
-![theme:red](https://chess-com-profile-widget.onrender.com/widget?username=alexandrabotez&theme=red)
----
-**dracula**
-
-![theme:dracula](https://chess-com-profile-widget.onrender.com/widget?username=divyadeshmukh23&theme=dracula)
----
-**terminal**
-
-![theme:terminal](https://chess-com-profile-widget.onrender.com/widget?username=echeceur11&theme=terminal)
----
-**brown**
-
-![theme:brown](https://chess-com-profile-widget.onrender.com/widget?username=magnuscarlsen&theme=brown)
----
-**solorized-dark**
-
-![theme:solorized-dark](https://chess-com-profile-widget.onrender.com/widget?username=supersecret12345&theme=solorized-dark)
----
+- [x] Cache
+- [x] Themes
+- [ ] Layouts
+- [x] Timeouts
+- [x] Health
+- [x] Lichess support
+  - [ ] Username validation
+  - [x] Username
+  - [x] Bio
+  - [x] Flair
+  - [x] Title: ``GM, WGM, IM, WIM, FM, WFM, NM, CM, WCM, WNM, LM, BOT``
+  - [x] Patron
+  - [x] Patron color
+  - [x] Flag
+  - [x] Total play time
+  - [x] Created at
+  - [x] Last seen
+  - [x] Stats
+  - [x] Profile URL
+  - [x] Verified
+  - [x] Create b64 for all assets
+    - [x] Flairs
+    - [x] ~~Verified~~
+    - [x] Patron wings
+    - [x] ~~Titles~~
+    - [x] Icons
+  - [x] Design card
+  - [x] Fix string width estimator
+  - [x] What if username is too long and the flair/flag overlaps the joined date?
+  - [x] Themes
+  - [x] Platform logo
+- [ ] Activity graph (GitHub commit graph style)
+- [ ] Parallelize upstream requests
+- [x] Handle long usernames like 'longestusernameinchessofc', 'WWWWWWWWWWWWWWWWWWWW'
+- [ ] Discord?
+- [ ] Custom themes
+- [x] Platform logo
+- [ ] Cache json body instead of the response object?
+- [ ] Make generate flag svg a static class method
+- [x] Refactor code - move lichess and chess.com specific constants/functions into the respective classes
+- [x] Typo solarized theme name
