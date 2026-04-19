@@ -34,12 +34,12 @@
   - [ ] Earth flag
   - [ ] Antarctica flag
 - [ ] Activity graph (GitHub commit graph style)
-- [ ] Parallelize upstream requests
+- [x] Parallelize upstream requests
 - [x] Handle long usernames like 'longestusernameinchessofc', 'WWWWWWWWWWWWWWWWWWWW'
 - [ ] Discord?
 - [ ] Custom themes
 - [x] Platform logo
 - [ ] Cache json body instead of the response object?
-- [ ] Make generate flag svg a static class method
+- [x] ~~Make generate flag svg a static class method~~
 - [x] Refactor code - move lichess and chess.com specific constants/functions into the respective classes
 - [x] Typo solarized theme name
