@@ -1,7 +1,9 @@
 import base64
 import concurrent.futures
+import copy
 
 import requests
+
 from .cache import cache
 from .constants_and_b64_assets import *
 from .utils import *

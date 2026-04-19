@@ -4,10 +4,10 @@ import time
 from flask import Flask, Response, g, request
 
 from .cache import cache
-from .constants_and_b64_assets import *
-from .utils import *
 from .chess_dot_com import ChessDotCom
+from .constants_and_b64_assets import *
 from .lichess import Lichess
+from .utils import *
 
 app = Flask(__name__)
 app.config["CACHE_TYPE"] = "SimpleCache"
