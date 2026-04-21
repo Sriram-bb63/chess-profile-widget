@@ -10,7 +10,7 @@ Showcase your Chess.com/lichess profile as a widget in your GitHub home page and
 
 <img src="https://chess-profile-widget.onrender.com/widget?platform=chess-dot-com&username=1234bb63&logo=true&theme=blues" alt="chess-profile-widget"/>
 
-<img src="https://chess-profile-widget.onrender.com/widget?platform=lichess&username=visualdennis&theme=dracula&logo=true" alt="chess-profile-widget"/>
+<img src="https://chess-profile-widget.onrender.com/widget?platform=lichess&username=Kurald_Galain&theme=dracula&logo=true" alt="chess-profile-widget"/>
 
 ## How to use
 
