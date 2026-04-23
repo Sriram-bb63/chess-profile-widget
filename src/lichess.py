@@ -1,10 +1,11 @@
 import concurrent.futures
 import copy
+import json
 
 import requests
 
-from .cache import cache
 from .constants_and_b64_assets import *
+from .redis_client import redis_client
 from .utils import *
 
 
@@ -14,32 +15,95 @@ class Lichess:
         pass
 
     @staticmethod
-    @cache.memoize(timeout=CACHE_LONG_TTL)
     def get_profile_data(username):
+        redis_key = f"lichess-profile-{username}"
+        cached_profile = redis_client.get(redis_key)
+        if cached_profile:
+            cached_profile = json.loads(cached_profile)
+            if cached_profile["status_code"] == 200:
+                return cached_profile
         profile_url = f"{LICHESS_BASE_URL}/api/user/{username}"
         profile_resp = requests.get(profile_url, headers=HEADERS)
-        return profile_resp
+        redis_val = {
+            "status_code": profile_resp.status_code,
+            "body": profile_resp.json(),
+        }
+        redis_client.setex(
+            name=redis_key,
+            value=json.dumps(redis_val),
+            time=(
+                CACHE_LONG_TTL
+                if redis_val["status_code"] == 200
+                else CACHE_VERY_SHORT_TTL
+            ),
+        )
+        return redis_val
 
     @staticmethod
-    @cache.memoize(timeout=CACHE_SHORT_TTL)
     def get_rapid_stats(username):
+        redis_key = f"lichess-stats-rapid-{username}"
+        cached_rapid_stats = redis_client.get(redis_key)
+        if cached_rapid_stats:
+            cached_rapid_stats = json.loads(cached_rapid_stats)
+            if cached_rapid_stats["status_code"] == 200:
+                return cached_rapid_stats
         rapid_url = f"{LICHESS_BASE_URL}/api/user/{username}/perf/rapid"
         rapid_resp = requests.get(rapid_url, headers=HEADERS)
-        return rapid_resp
+        redis_val = {"status_code": rapid_resp.status_code, "body": rapid_resp.json()}
+        redis_client.setex(
+            name=redis_key,
+            value=json.dumps(redis_val),
+            time=(
+                CACHE_SHORT_TTL
+                if redis_val["status_code"] == 200
+                else CACHE_VERY_SHORT_TTL
+            ),
+        )
+        return redis_val
 
     @staticmethod
-    @cache.memoize(timeout=CACHE_SHORT_TTL)
     def get_blitz_stats(username):
+        redis_key = f"lichess-blitz-{username}"
+        cached_blitz_stats = redis_client.get(redis_key)
+        if cached_blitz_stats:
+            cached_blitz_stats = json.loads(cached_blitz_stats)
+            if cached_blitz_stats["status_code"] == 200:
+                return cached_blitz_stats
         blitz_url = f"{LICHESS_BASE_URL}/api/user/{username}/perf/blitz"
         blitz_resp = requests.get(blitz_url, headers=HEADERS)
-        return blitz_resp
+        redis_val = {"status_code": blitz_resp.status_code, "body": blitz_resp.json()}
+        redis_client.setex(
+            name=redis_key,
+            value=json.dumps(redis_val),
+            time=(
+                CACHE_SHORT_TTL
+                if redis_val["status_code"] == 200
+                else CACHE_VERY_SHORT_TTL
+            ),
+        )
+        return redis_val
 
     @staticmethod
-    @cache.memoize(timeout=CACHE_SHORT_TTL)
     def get_bullet_stats(username):
+        redis_key = f"lichess-bullet-{username}"
+        cached_bullet_stats = redis_client.get(redis_key)
+        if cached_bullet_stats:
+            cached_bullet_stats = json.loads(cached_bullet_stats)
+            if cached_bullet_stats["status_code"] == 200:
+                return cached_bullet_stats
         bullet_url = f"{LICHESS_BASE_URL}/api/user/{username}/perf/bullet"
         bullet_resp = requests.get(bullet_url, headers=HEADERS)
-        return bullet_resp
+        redis_val = {"status_code": bullet_resp.status_code, "body": bullet_resp.json()}
+        redis_client.setex(
+            name=redis_key,
+            value=json.dumps(redis_val),
+            time=(
+                CACHE_SHORT_TTL
+                if redis_val["status_code"] == 200
+                else CACHE_VERY_SHORT_TTL
+            ),
+        )
+        return redis_val
 
     @staticmethod
     def normalize_stats(rapid_stats, blitz_stats, bullet_stats):
@@ -92,9 +156,9 @@ class Lichess:
             bullet_resp = bullet_future.result()
 
         # Profile
-        if profile_resp.status_code != 200:
+        if profile_resp["status_code"] != 200:
             return {"error": "Could not fetch profile data from lichess.org"}
-        profile_body = profile_resp.json()
+        profile_body = profile_resp["body"]
         is_acc_disabled = profile_body.get("disabled")
         if is_acc_disabled:
             return {"error": "Lichess account is disabled"}
@@ -117,14 +181,14 @@ class Lichess:
 
         # Stats
         if (
-            rapid_resp.status_code != 200
-            or blitz_resp.status_code != 200
-            or bullet_resp.status_code != 200
+            rapid_resp["status_code"] != 200
+            or blitz_resp["status_code"] != 200
+            or bullet_resp["status_code"] != 200
         ):
             return {"error": "Could not fetch player stats from lichess.org"}
-        rapid_body = rapid_resp.json()
-        blitz_body = blitz_resp.json()
-        bullet_body = bullet_resp.json()
+        rapid_body = rapid_resp["body"]
+        blitz_body = blitz_resp["body"]
+        bullet_body = bullet_resp["body"]
         profile_summary["stats"] = {}
         (
             profile_summary["stats"]["rapid"],

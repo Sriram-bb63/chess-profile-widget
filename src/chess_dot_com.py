@@ -1,11 +1,12 @@
 import base64
 import concurrent.futures
 import copy
+import json
 
 import requests
 
-from .cache import cache
 from .constants_and_b64_assets import *
+from .redis_client import redis_client
 from .utils import *
 
 
@@ -19,18 +20,51 @@ class ChessDotCom:
         return bool(USERNAME_REGEX.fullmatch(username))
 
     @staticmethod
-    @cache.memoize(timeout=CACHE_LONG_TTL)
     def get_profile_data(username):
+        redis_key = f"chess.com-profile-{username}"
+        cached_profile = redis_client.get(redis_key)
+        if cached_profile:
+            cached_profile = json.loads(cached_profile)
+            if cached_profile["status_code"] == 200:
+                return cached_profile
         profile_url = f"{CHESS_DOT_COM_BASE_URL}/pub/player/{username}"
         profile_resp = requests.get(profile_url, headers=HEADERS)
-        return profile_resp
+        redis_val = {
+            "status_code": profile_resp.status_code,
+            "body": profile_resp.json(),
+        }
+        redis_client.setex(
+            name=redis_key,
+            value=json.dumps(redis_val),
+            time=(
+                CACHE_LONG_TTL
+                if redis_val["status_code"] == 200
+                else CACHE_VERY_SHORT_TTL
+            ),
+        )
+        return redis_val
 
     @staticmethod
-    @cache.memoize(timeout=CACHE_SHORT_TTL)
     def get_player_stats(username):
+        redis_key = f"chess.com-stats-{username}"
+        cached_stats = redis_client.get(redis_key)
+        if cached_stats:
+            cached_stats = json.loads(cached_stats)
+            if cached_stats["status_code"] == 200:
+                return cached_stats
         stats_url = f"{CHESS_DOT_COM_BASE_URL}/pub/player/{username}/stats"
         stats_resp = requests.get(stats_url, headers=HEADERS)
-        return stats_resp
+        redis_val = {"status_code": stats_resp.status_code, "body": stats_resp.json()}
+        redis_client.setex(
+            name=redis_key,
+            value=json.dumps(redis_val),
+            time=(
+                CACHE_SHORT_TTL
+                if redis_val["status_code"] == 200
+                else CACHE_VERY_SHORT_TTL
+            ),
+        )
+        return redis_val
 
     @staticmethod
     def normalize_stats(stats):
@@ -49,10 +83,15 @@ class ChessDotCom:
         return normalized_stats
 
     @staticmethod
-    @cache.memoize(timeout=CACHE_LONG_TTL)
-    def generate_avatar_png_b64(avatar_url):
+    def generate_avatar_png_b64(username, avatar_url):
+        redis_key = f"chess.com-avatar-{username}"
+        cached_avatar_b64 = redis_client.get(redis_key)
+        if cached_avatar_b64:
+            return f"""data:image/png;base64,{cached_avatar_b64.decode("utf-8")}"""
         avatar_resp = requests.get(avatar_url)
-        return f"""data:image/png;base64,{base64.b64encode(avatar_resp.content).decode("utf-8")}"""
+        avatar_b64 = base64.b64encode(avatar_resp.content).decode("utf-8")
+        redis_client.setex(name=redis_key, time=CACHE_LONG_TTL, value=avatar_b64)
+        return f"""data:image/png;base64,{avatar_b64}"""
 
     @staticmethod
     def create_profile_summary(username):
@@ -64,9 +103,9 @@ class ChessDotCom:
             profile_resp = profile_future.result()
             stats_resp = stats_future.result()
 
-        if profile_resp.status_code != 200:
+        if profile_resp["status_code"] != 200:
             return {"error": "Could not fetch profile data from chess.com"}
-        profile_body = profile_resp.json()
+        profile_body = profile_resp["body"]
         profile_summary["username"] = username
         profile_summary["avatar_url"] = profile_body.get("avatar")
         profile_summary["profile_url"] = profile_body["url"]
@@ -81,9 +120,9 @@ class ChessDotCom:
         profile_summary["league"] = profile_body.get("league")
 
         # Get stats data
-        if stats_resp.status_code != 200:
+        if stats_resp["status_code"] != 200:
             return {"error": "Could not fetch stats data from chess.com"}
-        stats_body = stats_resp.json()
+        stats_body = stats_resp["body"]
         profile_summary["stats"] = {}
         profile_summary["stats"]["rapid"] = ChessDotCom.normalize_stats(
             stats=stats_body.get("chess_rapid")
@@ -121,7 +160,7 @@ class ChessDotCom:
             else ""
         )
         background_svg = f"""<rect width="400" height="265" fill="{colors["bg"]}" rx="12" ry="12" />"""
-        avatar_svg = f"""<a href="{player_data['profile_url']}" target="_blank"> <image href="{ChessDotCom.generate_avatar_png_b64(avatar_url=player_data['avatar_url']) if player_data['avatar_url'] else NO_AVATAR_PNG_B64}" x="11" y="15" width="75" height="75" clip-path="inset(0% round 5px)" /> </a>"""
+        avatar_svg = f"""<a href="{player_data['profile_url']}" target="_blank"> <image href="{ChessDotCom.generate_avatar_png_b64(username=player_data['username'], avatar_url=player_data['avatar_url']) if player_data['avatar_url'] else NO_AVATAR_PNG_B64}" x="11" y="15" width="75" height="75" clip-path="inset(0% round 5px)" /> </a>"""
         flag_svg = generate_flag_svg(country_code=player_data["country_code"])
         username_svg = f"""<a href="{player_data['profile_url']}" target="_blank"> <text x="100" y="35" fill="{colors["text-bright"]}" font-family="Arial" font-size="16" font-weight="bold">{fit_username(username=player_data['username'], font_size=16, max_width=180)}</text> </a>"""
         if player_data["league"]:
