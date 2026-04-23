@@ -1,0 +1,17 @@
+services:
+  web:
+    build: .
+    container_name: flask_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  redis:
+    image: redis:8-alpine
+    container_name: redis_server
+    ports:
+      - "6379:6379"
