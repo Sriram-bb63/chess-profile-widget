@@ -51,8 +51,11 @@ class ChessDotCom:
     @staticmethod
     @cache.memoize(timeout=CACHE_LONG_TTL)
     def generate_avatar_png_b64(avatar_url):
-        avatar_resp = requests.get(avatar_url)
-        return f"""data:image/png;base64,{base64.b64encode(avatar_resp.content).decode("utf-8")}"""
+        avatar_resp = requests.get(avatar_url, headers=HEADERS)
+        content_type = avatar_resp.headers.get("Content-Type", "")
+        if not avatar_resp.ok or not content_type.startswith("image/"):
+            return NO_AVATAR_PNG_B64
+        return f"""data:{content_type};base64,{base64.b64encode(avatar_resp.content).decode("utf-8")}"""
 
     @staticmethod
     def create_profile_summary(username):
